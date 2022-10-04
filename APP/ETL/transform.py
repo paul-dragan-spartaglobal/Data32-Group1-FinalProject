@@ -67,10 +67,9 @@ def get_attributes_table():
     print(attributes)
     return attributes
 
-def table_students(raw_json_path = "code/Data32-Group1-FinalProject/APP/Extract/All_JSON_Data.csv", raw_csv_path = "code/Data32-Group1-FinalProject/APP/Extract/All_CSV_Data.csv"):
+def table_students(raw_json_path = "All_JSON_Data.csv", raw_csv_path = "All_CSV_Data.csv"):
     df_json = pd.read_csv(raw_json_path)
     df_csv = pd.read_csv(raw_csv_path)
-    df_json = df_json.drop_duplicates(subset = ['name','date'],keep='first')
     students = pd.DataFrame()
     students_name = df_json[["name", "result"]].loc[df_json["result"]=='Pass']
     students['student_name'] = pd.concat([students_name['name'], df_csv['name']])
@@ -81,7 +80,7 @@ def table_students(raw_json_path = "code/Data32-Group1-FinalProject/APP/Extract/
     students.to_csv('students.csv')
     return students
 
-def table_scores(raw_csv_path = "code/Data32-Group1-FinalProject/APP/Extract/All_CSV_Data.csv"):
+def table_scores(raw_csv_path = "All_CSV_Data.csv"):
     df_csv = pd.read_csv(raw_csv_path)
     students = table_students()
     df_csv['student_id'] = df_csv['name'].map(students.set_index('student_name')['student_id'])
@@ -95,7 +94,7 @@ def table_scores(raw_csv_path = "code/Data32-Group1-FinalProject/APP/Extract/All
     new_df["Week"] = new_df["Week"].map(lambda x: int(x.lstrip("W")))
     return new_df.sort_values(by=['student_id','Week']).reset_index(drop=True)
 
-def applicants_table(csv_path = "code/Data32-Group1-FinalProject/APP/Extract/All_JSON_Data.csv"):
+def applicants_table(csv_path = "All_JSON_Data.csv"):
     df_json = pd.read_csv(csv_path)
     # applicants = pd.DataFrame()
     applicants = df_json[['name', 'date', 'self_development', 'geo_flex',
@@ -104,7 +103,7 @@ def applicants_table(csv_path = "code/Data32-Group1-FinalProject/APP/Extract/All
     applicants['applicant_id'] = 'A' + applicants['applicant_id'].astype(str)
     return applicants
 
-def create_trainers_table(raw_csv_path = "code/Data32-Group1-FinalProject/APP/Extract/All_CSV_Data.csv"):
+def create_trainers_table(raw_csv_path = "All_CSV_Data.csv"):
     df_csv = pd.read_csv(raw_csv_path)
     trainers = pd.DataFrame()
     trainers['trainer_name'] = df_csv['trainer']
@@ -115,7 +114,7 @@ def create_trainers_table(raw_csv_path = "code/Data32-Group1-FinalProject/APP/Ex
     del trainers['index']
     print(trainers)
 
-def course_name_table(csv_path = "code/Data32-Group1-FinalProject/APP/Extract/All_JSON_Data.csv"):
+def course_name_table(csv_path = "All_JSON_Data.csv"):
     df_json = pd.read_csv(csv_path)
     course = pd.DataFrame()
     course['course_interest'] = df_json['course_interest']
@@ -126,7 +125,7 @@ def course_name_table(csv_path = "code/Data32-Group1-FinalProject/APP/Extract/Al
     del course['index']
     print(course)
 
-def language_table(csv_path = "code/Data32-Group1-FinalProject/APP/Extract/All_JSON_Data.csv"):
+def language_table(csv_path = "All_JSON_Data.csv"):
     data = pd.read_csv(csv_path)
     tech_data = data.filter(regex='tech_self_score')
     languages_list = []

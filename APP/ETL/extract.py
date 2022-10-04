@@ -55,7 +55,9 @@ def export_talent(json_keys):
         #concatenate all the files into a data frame
         df2 = pd.concat([df2, df3], ignore_index=True)
     #convert the dataframe with all details into a CSV file
-    df2.to_csv("All_JSON_Data.csv")
+    df3 = df2.drop_duplicates(subset = ['name'],keep='first')
+    print(df3)
+    df3.to_csv("All_JSON_Data.csv")
 
 
 csv_keys, json_keys = get_keys()
