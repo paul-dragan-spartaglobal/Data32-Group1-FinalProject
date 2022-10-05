@@ -68,12 +68,10 @@ def get_attributes_table():
     print(attributes)
     return attributes
 
-def table_students(raw_json_path = "All_JSON_Data.csv", raw_csv_path = "All_CSV_Data.csv"):
-    df_json = pd.read_csv(raw_json_path)
-    df_csv = pd.read_csv(raw_csv_path)
+def table_students(csv_path = "All_CSV_Data.csv"):
+    df_csv = pd.read_csv(csv_path)
     students = pd.DataFrame()
-    students_name = df_json[["name", "result"]].loc[df_json["result"]=='Pass']
-    students['student_name'] = pd.concat([students_name['name'], df_csv['name']])
+    students[['student_name','trainer_name','course_name']] = df_csv[['name','trainer','course']]
     students = students.drop_duplicates(subset = ['student_name'],keep='first')
     students.reset_index(inplace=True,drop=True)
     students.insert(0, 'student_id', range(100, 100+len(students)))
@@ -128,7 +126,7 @@ def course_name_table(csv_path = "All_JSON_Data.csv"):
     course.insert(0, 'course_id', range(100, 100+len(course)))
     course['course_id'] = 'C' + course['course_id'].astype(str)
     del course['index']
-    print(course)
+    return course
 
 def language_table(csv_path = "All_JSON_Data.csv"):
     data = pd.read_csv(csv_path)
@@ -162,5 +160,6 @@ def tech_score_table(csv_path = "All_JSON_Data.csv"):
 
 
 if __name__ == '__main__':
-    print(table_scores())
+    print(table_students())
+    
     
