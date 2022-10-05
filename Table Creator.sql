@@ -1,16 +1,21 @@
+DROP DATABASE IF EXISTS academy;
+CREATE DATABASE academy;
+USE academy;
 CREATE TABLE Courses (
-   course_id int NOT NULL PRIMARY KEY,
+   course_id varchar NOT NULL PRIMARY KEY,
    course_name VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE Trainer (
-   trainer_id int NOT NULL PRIMARY KEY,
+   trainer_id varchar NOT NULL PRIMARY KEY,
    trainer_name VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE Students (
-   student_id int NOT NULL PRIMARY KEY,
-   student_name VARCHAR(20) NOT NULL
+   student_id varchar NOT NULL PRIMARY KEY,
+   student_name VARCHAR(20) NOT NULL,
+   trainer_id VARCHAR,
+   course_id varchar
 );
 CREATE TABLE Languages (
    language_id int NOT NULL PRIMARY KEY,
@@ -19,55 +24,54 @@ CREATE TABLE Languages (
 
 CREATE TABLE Scores (
     week_id int NOT NULL,
-    student_id int FOREIGN KEY REFERENCES Students(student_id),
-    imaginative_score int,
-    analytics_score int,
-    determined_score int,
-    independent_score int,
-    studious_score int,
-    professional_score int,
+    student_id varchar FOREIGN KEY REFERENCES Students(student_id),
+    imaginative_score float,
+    analytics_score float,
+    determined_score float,
+    independent_score float,
+    studious_score float,
+    professional_score float,
     PRIMARY KEY (week_id, student_id)
 );
 
 
 
 CREATE TABLE Attributes(
-	attribute_id int NOT NULL,
-	attribute_name varchar,
-	strengths varchar,
-	weaknesses varchar
-)
+	attribute_id varchar NOT NULL,
+	attributes varchar,
+    weaknesses Boolean,
+	strengths Boolean
+	
+);
 
 
 CREATE TABLE Fact_table(
-	record_id int NOT NULL PRIMARY KEY,
-	trainer_id int FOREIGN KEY REFERENCES Trainer(trainer_id) ,
-	student_id int FOREIGN KEY REFERENCES Students(student_id),
-	applicant_id int FOREIGN KEY REFERENCES Applicants(applicant_id),
-	course_id int FOREIGN KEY REFERENCES Courses(course_id)
-)
+	student_id varchar FOREIGN KEY REFERENCES Students(student_id),
+	applicant_id varchar FOREIGN KEY REFERENCES Applicants(applicant_id),
+	
+);
 
 CREATE TABLE Applicants (
-    applicant_id INT PRIMARY KEY REFERENCES Fact_table(applicant_id),
+    applicant_id varchar PRIMARY KEY REFERENCES Fact_table(applicant_id),
     applicant_name VARCHAR,
     dates datetime,
     self_development VARCHAR,
-    geo_flex Boolean,
-    financial_support Boolean,
-    result Boolean,
+    geo_flex varchar,
+    financial_support varchar,
+    result varchar,
     course_interest VARCHAR
-)
+);
 
 CREATE TABLE Tech_self_score(
-    applicant_id INT FOREIGN KEY REFERENCES Applicants(applicant_id),
+    applicant_id varchar FOREIGN KEY REFERENCES Applicants(applicant_id),
     language_id INT FOREIGN KEY REFERENCES Languages(language_id),
     score INT,
     PRIMARY KEY(applicant_id, language_id)
-)
+);
 
 
 CREATE TABLE Applicant_attributes (
-    applicant_id INT FOREIGN KEY REFERENCES Applicants(applicant_id),
-    attributes_id INT FOREIGN KEY REFERENCES Attributes(attribute_id),
+    applicant_id varchar FOREIGN KEY REFERENCES Applicants(applicant_id),
+    attributes_id varchar FOREIGN KEY REFERENCES Attributes(attribute_id),
     PRIMARY KEY(applicant_id, attributes_id)
-)
+);

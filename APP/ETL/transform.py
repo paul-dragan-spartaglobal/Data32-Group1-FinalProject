@@ -27,6 +27,7 @@ def get_strengths(csv_path = "All_JSON_Data.csv"):
     list1=list(set_strengths)
     df_strengths = pd.DataFrame(list1,columns=["attributes"])
     df_strengths["strengths"]=True
+    df_strengths["weaknesses"]=False
     return df_strengths
 
 def get_weakness(csv_path = "All_JSON_Data.csv"):
@@ -50,7 +51,8 @@ def get_weakness(csv_path = "All_JSON_Data.csv"):
             set_weaknesses.add(object)
     list2 = list(set_weaknesses)
     df_weakness = pd.DataFrame(list2, columns=["attributes"])
-    df_weakness["weakness"] = True
+    df_weakness["weaknesses"] = True
+    df_weakness["strengths"] = False
     return df_weakness
 
 def get_all_attributes():
@@ -98,6 +100,7 @@ def table_scores(csv_path = "All_CSV_Data.csv"):
     column_list = df.columns.tolist()
     column_list[0], column_list[1] = column_list[1],column_list[0]
     df = df[column_list]
+    
     return df
 
 def applicants_table(csv_path = "All_JSON_Data.csv"):
@@ -160,6 +163,7 @@ def tech_score_table(csv_path = "All_JSON_Data.csv"):
     df['language_id'] = df['language_name'].map(languages.set_index('language_name')['language_id'])
     df.drop(['name','language_name'],axis=1, inplace=True)
     df = df[['applicant_id','language_id','tech_self_score']]
+    df['tech_self_score'] = df['tech_self_score'].apply(lambda x : int(x))
     return df
 
 def junction_table_applicants(csv_path = "All_JSON_Data.csv"):
@@ -196,10 +200,9 @@ def students_applicants_junction_table():
     applicants = applicants_table()
     students = table_students()[['student_id','student_name']]
     students['applicant_id'] = students['student_name'].map(applicants.set_index('name')['applicant_id'])
-    junction_table = students
+    junction_table = students[['student_id','applicant_id']]
     return junction_table
 
 if __name__ == '__main__':
-    print(students_applicants_junction_table())
-    
+    print(tech_score_table())
     
