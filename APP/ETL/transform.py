@@ -161,3 +161,5 @@ def tech_score_table(csv_path = "All_JSON_Data.csv"):
 
 if __name__ == '__main__':
     print(table_students())
+    
+    
