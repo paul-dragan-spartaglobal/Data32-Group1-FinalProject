@@ -3,6 +3,8 @@ import numpy as np
 import pyodbc
 import csv
 import os
+import warnings
+warnings.filterwarnings('ignore')
 
 #Get the current working directory (cwd)
 # cwd=os.getcwd()
@@ -158,8 +160,19 @@ def tech_score_table(csv_path = "All_JSON_Data.csv"):
     df = df[['applicant_id','language_id','tech_self_score']]
     return df
 
+def junction_table_applicants(csv_path = "All_JSON_Data.csv"):
+    df_json =pd.read_csv(csv_path)
+    df = df_json[['name','strengths', 'weaknesses']]
+    strengths = df["strengths"]
+    weaknesses = df["weaknesses"]
+    df['strengths'] = strengths.apply(lambda x: x.replace("'","").replace("[","").replace("]", ""))
+    df['weaknesses'] = weaknesses.apply(lambda x: x.replace("'","").replace("[","").replace("]", ""))
+    df['attributes'] = df['strengths']+', '+df['weaknesses']
+    df.drop(["strengths","weaknesses"], axis=1 , inplace=True)
+    return df
+
 
 if __name__ == '__main__':
-    print(table_students())
+    print(junction_table_applicants())
     
     
