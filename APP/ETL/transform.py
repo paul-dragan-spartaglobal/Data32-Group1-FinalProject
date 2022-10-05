@@ -6,12 +6,6 @@ import os
 import warnings
 warnings.filterwarnings('ignore')
 
-#Get the current working directory (cwd)
-# cwd=os.getcwd()
-# Get all the files in that directory
-# files = os.listdir(cwd)
-# print("Files in %r: %s" % (cwd, files))
-
 df_csv = pd.read_csv("All_CSV_Data.csv")
 df_json = pd.read_csv("All_JSON_Data.csv")
 
@@ -35,9 +29,10 @@ def get_strengths(csv_path = "All_JSON_Data.csv"):
     df_strengths["strengths"]=True
     return df_strengths
 
-
 def get_weakness(csv_path = "All_JSON_Data.csv"):
     df_json = pd.read_csv(csv_path)
+    strengths = get_strengths()
+    temp_list = list(strengths['attributes'])
     weaknesses_list=[]
     distinct_strengths=[]
     weaknesses = df_json["weaknesses"]
@@ -50,6 +45,8 @@ def get_weakness(csv_path = "All_JSON_Data.csv"):
         stripped_element = replaced_element.strip("[]")
         split_element = stripped_element.split(", ")
         for object in split_element:
+            if object in temp_list:
+                object = 'Too '+ object
             set_weaknesses.add(object)
     list2 = list(set_weaknesses)
     df_weakness = pd.DataFrame(list2, columns=["attributes"])
@@ -67,17 +64,21 @@ def get_attributes_table():
     attributes.insert(0, 'attribute_id', range(100, 100+len(attributes)))
     attributes['attribute_id']= 'ATR' + attributes['attribute_id'].astype(str)
     del attributes['index']
-    print(attributes)
     return attributes
 
 def table_students(csv_path = "All_CSV_Data.csv"):
     df_csv = pd.read_csv(csv_path)
     students = pd.DataFrame()
+    trainers = create_trainers_table()
+    courses = course_name_table()
     students[['student_name','trainer_name','course_name']] = df_csv[['name','trainer','course']]
     students = students.drop_duplicates(subset = ['student_name'],keep='first')
     students.reset_index(inplace=True,drop=True)
     students.insert(0, 'student_id', range(100, 100+len(students)))
     students['student_id']= 'S' + students['student_id'].astype(str)
+    students['trainer_id'] = students['trainer_name'].map(trainers.set_index('trainer_name')['trainer_id'])
+    students['course_id'] = students['course_name'].map(courses.set_index('course_name')['course_id'])
+    students.drop(['trainer_name','course_name'],axis=1, inplace=True)
     return students
 
 def table_scores(csv_path = "All_CSV_Data.csv"):
@@ -117,7 +118,7 @@ def create_trainers_table(csv_path = "All_CSV_Data.csv"):
     trainers.insert(0, 'trainer_id', range(100, 100+len(trainers)))
     trainers['trainer_id']='T' + trainers['trainer_id'].astype(str)
     del trainers['index']
-    print(trainers)
+    return trainers
 
 def course_name_table(csv_path = "All_JSON_Data.csv"):
     df_json = pd.read_csv(csv_path)
@@ -128,6 +129,7 @@ def course_name_table(csv_path = "All_JSON_Data.csv"):
     course.insert(0, 'course_id', range(100, 100+len(course)))
     course['course_id'] = 'C' + course['course_id'].astype(str)
     del course['index']
+    course.rename(columns={'course_interest':'course_name'}, inplace=True)
     return course
 
 def language_table(csv_path = "All_JSON_Data.csv"):
@@ -162,17 +164,42 @@ def tech_score_table(csv_path = "All_JSON_Data.csv"):
 
 def junction_table_applicants(csv_path = "All_JSON_Data.csv"):
     df_json =pd.read_csv(csv_path)
+    applicants = applicants_table()
+    attributes = get_attributes_table()
     df = df_json[['name','strengths', 'weaknesses']]
-    strengths = df["strengths"]
-    weaknesses = df["weaknesses"]
-    df['strengths'] = strengths.apply(lambda x: x.replace("'","").replace("[","").replace("]", ""))
-    df['weaknesses'] = weaknesses.apply(lambda x: x.replace("'","").replace("[","").replace("]", ""))
+    df['strengths'] = df["strengths"].apply(lambda x: x.replace("'","").replace("[","").replace("]", ""))
+    df['weaknesses'] = df["weaknesses"].apply(lambda x: x.replace("'","").replace("[","").replace("]", ""))
     df['attributes'] = df['strengths']+', '+df['weaknesses']
     df.drop(["strengths","weaknesses"], axis=1 , inplace=True)
-    return df
+    list = []
+    for index, row in df.iterrows():
+        temp_dict2 = {}
+        for string in row['attributes'].split(', '):
+            temp_dict2[string]=1
+        temp_dict = {'name':row['name'], 'attributes':temp_dict2}
+        list.append(temp_dict)
+    df1 = pd.DataFrame()
+    for record in list:
+        df_normalized = pd.json_normalize(record, max_level=1)
+        df1 = pd.concat([df_normalized, df1], ignore_index=True)
+    last_df = (pd.wide_to_long(df1, ['attributes'],
+                         i=['name'],
+                         j='attribute_name', 
+                         sep='.', 
+                         suffix='(\D+|\w+)')).reset_index()
+    last_df['applicant_id'] = last_df['name'].map(applicants.set_index('name')['applicant_id'])
+    last_df['attribute_id'] = last_df['attribute_name'].map(attributes.set_index('attributes')['attribute_id'])
+    last_df.drop(['attributes', 'name', 'attribute_name'],axis=1, inplace=True)
+    return last_df
 
+def students_applicants_junction_table():
+    applicants = applicants_table()
+    students = table_students()[['student_id','student_name']]
+    students['applicant_id'] = students['student_name'].map(applicants.set_index('name')['applicant_id'])
+    junction_table = students
+    return junction_table
 
 if __name__ == '__main__':
-    print(junction_table_applicants())
+    print(students_applicants_junction_table())
     
     
