@@ -204,5 +204,5 @@ def students_applicants_junction_table():
     return junction_table
 
 if __name__ == '__main__':
-    print(tech_score_table())
+    print(course_name_table())
     
