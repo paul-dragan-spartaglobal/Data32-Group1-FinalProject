@@ -49,7 +49,7 @@ CREATE TABLE Attributes(
 CREATE TABLE Applicants (
     applicant_id VARCHAR(20) PRIMARY KEY,
     applicant_name VARCHAR(30),
-    dates DATETIME,
+    dates VARCHAR(20),
     self_development VARCHAR(20),
     geo_flex VARCHAR(20),
     financial_support VARCHAR(20),
