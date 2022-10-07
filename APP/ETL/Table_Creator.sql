@@ -28,12 +28,12 @@ CREATE TABLE Languages (
 CREATE TABLE Scores (
     week_id INT NOT NULL,
     student_id VARCHAR(20) FOREIGN KEY REFERENCES Students(student_id),
-    imaginative_score FLOAT,
-    analytics_score FLOAT,
-    determined_score FLOAT,
-    independent_score FLOAT,
-    studious_score FLOAT,
-    professional_score FLOAT,
+    imaginative_score INT,
+    analytics_score INT,
+    determined_score INT,
+    independent_score INT,
+    studious_score INT,
+    professional_score INT,
     PRIMARY KEY (week_id, student_id)
 );
 

@@ -100,7 +100,8 @@ def table_scores(csv_path = "All_CSV_Data.csv"):
     column_list = df.columns.tolist()
     column_list[0], column_list[1] = column_list[1],column_list[0]
     df = df[column_list]
-    
+    df = df.fillna(-1)
+    df = df.astype({"Analytic":"int","Independent":"int","Determined":"int","Professional":"int","Studious":"int","Imaginative":"int"})
     return df
 
 def applicants_table(csv_path = "All_JSON_Data.csv"):
@@ -201,7 +202,8 @@ def students_applicants_junction_table():
     students = table_students()[['student_id','student_name']]
     students['applicant_id'] = students['student_name'].map(applicants.set_index('name')['applicant_id'])
     junction_table = students[['student_id','applicant_id']]
-    return junction_table
+    junction_table = junction_table[junction_table.applicant_id.notnull()]
+    return junction_table.reset_index()
 
 if __name__ == '__main__':
     print(course_name_table())
