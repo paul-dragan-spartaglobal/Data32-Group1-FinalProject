@@ -10,3 +10,7 @@ ERD:https://ibb.co/fxR2Wqr
 #Step 5. Check Azure Data Studio
 #Step 6. Write some querries 
 #Step 7. Enjoy ! 
+
+
+
+To check if the data is up to date from the s3 bucket , please run check.py separately 
