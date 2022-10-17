@@ -19,20 +19,35 @@ def original_timestamps():
     time_stamps = {}
     for item in bucket_contents:
         time_stamps[item['Key']] = str(item["LastModified"])
-    with open("timestamps.txt","w") as file:
+    with open("timestamps.json","w") as file:
         file.write(json.dumps(time_stamps))
+
+# original_timestamps()
 
 
 def current_timestamps():
     try:
-        with open("timestamps.txt", "r") as file:
-            old_timestamps = file.read()
+        with open("timestamps.json", "r") as file:
+            old_timestamps = json.load(file)
     except FileNotFoundError:
         original_timestamps()
-        with open("timestamps.txt", "r") as file:
-            old_timestamps = file.read()
-    print(old_timestamps)
+        with open("timestamps.json", "r") as file:
+            old_timestamps = json.load(file)
+    return old_timestamps
+
+def compare():
+    bucket_contents = s3_client.list_objects_v2(Bucket = bucket_name)['Contents']
+    time_stamps = {}
+    for item in bucket_contents:
+        time_stamps[item['Key']] = str(item["LastModified"])
+
+    if current_timestamps() == time_stamps:
+        print("up to date")
+    else:
+        original_timestamps()
+        print("please run the main file for an update")
 current_timestamps()
+compare()
 
 
 
